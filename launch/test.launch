@@ -1,0 +1,22 @@
+<launch>
+<param name="use_sim_time" value="false" />
+
+<!--   <node pkg="openpose_utils_launch" type="readBag.py" name="readBag" output="screen">
+    <param name="bag_file" value="/home/liger/temp-rosbags/reaching_x1.bag" />
+    <param name="listen_topic" value="/openpose_ros_receiver/robot_frame_coords_msg" />
+  </node>
+ -->
+<!-- 
+<node pkg="openpose_utils_launch" type="readBag.py" name="readBag" output="screen">
+  <param name="bag_file" value="/home/liger/temp-rosbags/reaching_x1.bag" />
+  <param name="listen_topic" value="/open_simulation" />
+</node>
+
+<node pkg="openpose_utils_launch" type="listenBag.py" name="listenBag" output="screen">
+</node>
+ -->
+
+ <node pkg="openpose_utils_launch" type="checkFrames.py" name="checkFrames" output="screen">
+</node>
+
+</launch>
