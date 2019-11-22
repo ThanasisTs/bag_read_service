@@ -3,6 +3,7 @@ from sensor_msgs.msg import Image, PointCloud2, CameraInfo
 import roslib, rospy, rosbag
 from std_srvs.srv import Empty,EmptyResponse, Trigger
 import sys
+# from rosgraph_msgs.msg import Clock
 
 class BagByService():
 
@@ -55,7 +56,8 @@ class BagByService():
     def pub_next_msg(self):
         for topic in self.topics:
             try:
-                _, msg, _ = self.messages[topic].next()
+                _, msg, t = self.messages[topic].next()
+
             except:
                 self.listOfEndConditions[topic] = True
                 continue

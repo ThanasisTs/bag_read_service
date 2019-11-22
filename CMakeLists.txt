@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(openpose_utils_launch)
+project(bag_read_service)
 
 find_package(catkin REQUIRED)
 

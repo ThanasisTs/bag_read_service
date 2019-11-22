@@ -16,7 +16,7 @@
 </node>
  -->
 
- <node pkg="openpose_utils_launch" type="checkFrames.py" name="checkFrames" output="screen">
+ <node pkg="bag_read_service" type="checkFrames.py" name="checkFrames" output="screen">
 </node>
 
 </launch>

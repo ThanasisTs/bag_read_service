@@ -4,6 +4,9 @@ import rospy
 from std_srvs.srv import Empty, Trigger, EmptyRequest
 from openpose_ros_receiver_msgs.msg import Keypoints_v
 
+
+# 3D topic name: /keypoint_3d_matching
+
 def callback(Keypoints_v):
 	rospy.wait_for_service('/next_msg')
 	try:
@@ -15,6 +18,7 @@ def callback(Keypoints_v):
 
 	except rospy.ServiceException, e:
 		print "Service call failed: %s"%e
+
 
 if __name__ == "__main__":
 	rospy.init_node('clientBag', anonymous=True)
