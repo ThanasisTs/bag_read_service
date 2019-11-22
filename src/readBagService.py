@@ -3,7 +3,7 @@ from sensor_msgs.msg import Image, PointCloud2, CameraInfo
 import roslib, rospy, rosbag
 from std_srvs.srv import Empty,EmptyResponse, Trigger
 import sys
-# from rosgraph_msgs.msg import Clock
+from rosgraph_msgs.msg import Clock
 
 class BagByService():
 
@@ -14,10 +14,11 @@ class BagByService():
         self.messages = {}
         self.listOfCounts = {}
         self.listOfEndConditions = {}
-        self.msg_types = [CameraInfo, Image, Image, PointCloud2]
+        self.msg_types = [CameraInfo, Image, Image, PointCloud2, Clock]
 
         #Create a publisher for each topic
         self.topics, _ = self.get_topic_and_type_list()
+
         for topic, msg_type in zip(self.topics, self.msg_types):
 
             # create list of publishers for each topic
@@ -31,7 +32,8 @@ class BagByService():
 
             # flag when generator emptied for each topic
             self.listOfEndConditions[topic] = False
-
+        # publisher for clock
+        self.clockPublisher = rospy.Publisher("/clock", Clock, queue_size = 10)
         # create a Server
         self.next_msgs_srv = rospy.Service('/next_msg', Empty, self.service)
 
@@ -57,13 +59,14 @@ class BagByService():
         for topic in self.topics:
             try:
                 _, msg, t = self.messages[topic].next()
-
             except:
                 self.listOfEndConditions[topic] = True
                 continue
+            if topic == "/camera/rgb/image_raw":
+                self.clockPublisher.publish(t)
+
             self.publishers[topic].publish(msg)
             self.listOfCounts[topic] += 1
-
 
     def service(self, req):
         try:

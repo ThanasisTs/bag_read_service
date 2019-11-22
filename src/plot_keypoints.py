@@ -39,11 +39,13 @@ listOfKeyPoints_x = ["/keypoint_3d_matching/keypoints/" + str(i) + "/points/poin
 listOfKeyPoints_y = ["/keypoint_3d_matching/keypoints/" + str(i) + "/points/point/y" for i in range(numOfKeyPoints)]
 listOfKeyPoints_z = ["/keypoint_3d_matching/keypoints/" + str(i) + "/points/point/z" for i in range(numOfKeyPoints)]
 
+# create new dataframe containing only columns with point information 
 new_df = pd.DataFrame()
 for point_list in [listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z]:
 	for col in point_list:
 		new_df[col] = df[col]
 
+# plot 3D scatter of points
 fig = plt.figure()
 ax = Axes3D(fig)
 
