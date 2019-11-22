@@ -13,5 +13,4 @@ Finally we run the `plot_keypoints.py` file with the name of the csv file as arg
 
         python src/plot_keypoints.py ~/keypoints.csv 
 
-![plot](keypoints.png)
-3D keypoints Scatterplot
+![Plot](keypoints.png)
