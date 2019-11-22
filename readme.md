@@ -1,4 +1,4 @@
-#Plot 3d Keypoints
+# Plot 3d Keypoints
 
 First we need to create a rosbag file contaning the 3d Keypoints.
 We set the pipeline and before calling the first service in a __new terminal__ we run:
