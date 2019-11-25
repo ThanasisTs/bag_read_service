@@ -1,16 +1,19 @@
-#Plot 3d Keypoints
+### Description
 
-First we need to create a rosbag file contaning the 3d Keypoints.
-We set the pipeline and before calling the first service in a __new terminal__ we run:
+Open a __new terminal__ and run an openpose_utils launch file.
+Example: 
+        roslaunch openpose_utils_launch openpose_sole.launch
 
-        rosbag record -O keypoints.bag /keypoint_3d_matching
+Start the server `readBagService.py` with the name of the rosbag file as an argument from `bag_read_service` package that provides the service of  reading the rosbag file and publishes its topics in a __new terminal__.
 
-When the keypoints.bag is ready we convert it into a csv file using the [rosbag_pandas](https://github.com/eurogroep/rosbag_pandas) library.
+        rosrun bag_read_service readBagService.py rosbag_file.bag
 
-        python bag_csv -b ~/keypoints.bag -o ~/keypoints.csv
+Start the client node `clientBag.py` in a __new terminal__. This node takes the topic where the `keypoint_3d_matching` publishes as argument. Every time that there is a new message on this topic the client requests the service of `readBagService.py.
+        
+        rosrun bag_read_service clientBag.py /keypoint_3d_matching
 
-Finally we run the `plot_keypoints.py` file with the name of the csv file as argument to obtain the plot of the 3d points.
+In a __new terminal__ run 
 
-        python src/plot_keypoints.py ~/keypoints.csv 
+        rosservice call /next_msg
 
-![Plot](keypoints.png)
+to read the first message from the rosbag file and start the pipeline.
