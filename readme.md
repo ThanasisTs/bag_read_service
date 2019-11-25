@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 ### Description
-=======
-# Plot 3d Keypoints
->>>>>>> refs/remotes/origin/master
 
 Open a __new terminal__ and run an openpose_utils launch file.
 Example: 
@@ -20,8 +16,4 @@ In a __new terminal__ run
 
         rosservice call /next_msg
 
-<<<<<<< HEAD
 to read the first message from the rosbag file and start the pipeline.
-=======
-![Plot](keypoints.png)
->>>>>>> refs/remotes/origin/master
