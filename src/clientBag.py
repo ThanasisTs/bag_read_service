@@ -2,7 +2,7 @@
 import sys
 import rospy
 from std_srvs.srv import Empty, Trigger, EmptyRequest
-from openpose_ros_receiver_msgs.msg import Keypoints_v
+from keypoint_3d_matching_msgs.msg import Keypoint3d_list
 
 
 # 3D topic name: /keypoint_3d_matching
@@ -27,5 +27,5 @@ if __name__ == "__main__":
 	service = rospy.ServiceProxy('/next_msg', Empty)
 
 	#run this file with the name of the topic
-	topic_sub = rospy.Subscriber(sys.argv[1], Keypoints_v, callback)
+	topic_sub = rospy.Subscriber(sys.argv[1], Keypoint3d_list, callback)
 	rospy.spin()

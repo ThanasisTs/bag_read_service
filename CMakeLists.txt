@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(bag_read_service)
 
-find_package(catkin REQUIRED)
+find_package(catkin REQUIRED COMPONENTS
+  keypoint_3d_matching_msgs
+)
 
 catkin_package()
 
