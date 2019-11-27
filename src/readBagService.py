@@ -80,8 +80,10 @@ if __name__=='__main__':
 
     rospy.init_node('bag_by_service')
 
+    bag_file = rospy.get_param('~bag_file') 
+    #bag_file = sys.argv[1]
     #run this file with the name of the bag file
-    bbs = BagByService(sys.argv[1])
+    bbs = BagByService(bag_file)
 
     while not rospy.is_shutdown():
         if all(value for value in bbs.listOfEndConditions.values()):

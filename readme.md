@@ -4,13 +4,12 @@ Open a __new terminal__ and run an openpose_utils launch file.
 Example: 
         roslaunch openpose_utils_launch openpose_sole.launch
 
-Start the server `readBagService.py` with the name of the rosbag file as an argument from `bag_read_service` package that provides the service of  reading the rosbag file and publishes its topics in a __new terminal__.
-
-        rosrun bag_read_service readBagService.py rosbag_file.bag
-
-Start the client node `clientBag.py` in a __new terminal__. This node takes the topic where the `keypoint_3d_matching` publishes as argument. Every time that there is a new message on this topic the client requests the service of `readBagService.py`.
+In a __new terminal__ run
         
-        rosrun bag_read_service clientBag.py /keypoint_3d_matching
+        roslaunch bag_read_service bag_read_service.launch
+The `bag_read_service.launch` starts the server `readBagService.py` with the name of the rosbag file as an argument. `readBagService.py` provides the service of reading the rosbag file and publishes its topics.
+
+The client node `clientBag.py`, which is also initiated, takes the topic where the `keypoint_3d_matching` publishes as argument. Every time that there is a new message on this topic the client requests the service of `readBagService.py`.
 
 In a __new terminal__ run 
 

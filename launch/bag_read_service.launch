@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+	<node pkg="bag_read_service" type="readBagService.py" name="BagServer" output="screen">
+		 <!-- <param name="bag_file" value="/home/liger/temp-rosbags/reaching_x1.bag" /> -->
+		 <param name="bag_file" value="/home/ttsitos/rosbags/xtion_rosbags/static_pose/long_static_1.bag" />	 
+	</node>
+
+	<node pkg="bag_read_service" type="clientBag.py" name="BagClient" output="screen">
+		 <param name="listen_topic" value="/keypoint_3d_matching" />	 
+	</node>
+	
+</launch>

@@ -22,7 +22,7 @@ to record the transformed keypoints.
 
 Finally, in a __new terminal__ we play the rosbag containing the 3D keypoints:
 
-        rosbag play keypoints.bag
+        rosbag play keypoints_tf.bag
 
 # Plot 3D Keypoints
 
