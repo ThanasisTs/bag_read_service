@@ -10,9 +10,12 @@ In a __new terminal__ we start the [static tf publisher](https://wiki.ros.org/tf
         roslaunch bag_read_service publish_tf.launch 
 this launch file always publishes a fixed transformation from `/camera_rgb_optical_frame` to `/base_link` frame.
 
+##### Important:
+Make sure the `keypoint_codes` in `frame_transpose.yaml` are identical with the `points_of_interest` in `keypoint_3d_matching.yaml` file.
+
 In a __new terminal__ we start the [frame_transpose](https://github.com/ThanasisTs/frame_transpose) node.
 
-        rosrun frame_transpose frame_transpose 
+        roslaunch frame_transpose frame_transpose.launch 
 This node takes messages published on /keypoint_3d_matching topic and transforms them to the `/base_link` frame. The transformed messages are being published on `/topic_transform`
 
 In a __new terminal__ we run:
@@ -22,7 +25,7 @@ to record the transformed keypoints.
 
 Finally, in a __new terminal__ we play the rosbag containing the 3D keypoints:
 
-        rosbag play keypoints_tf.bag
+        rosbag play keypoints.bag
 
 # Plot 3D Keypoints
 
