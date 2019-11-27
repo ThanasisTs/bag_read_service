@@ -37,6 +37,6 @@ When the keypoints.bag is ready we convert it into a csv file using the [rosbag_
 
 Finally we run the `plot_keypoints.py` file with the name of the csv file as argument to obtain the plot of the 3d points.
 
-        python src/plot_keypoints.py ~/keypoints_tf.csv 
+        python plot/plot_keypoints.py ~/keypoints_tf.csv 
 
 ![Plot](keypoints_base_link.png)

@@ -8,6 +8,7 @@ import re
 import string
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
+from itertools import cycle
 
 filename = sys.argv[1]
 
@@ -26,14 +27,12 @@ def getKeypointNames(columns):
 			listOfNames.append(df[col].loc[0])
 	return listOfNames
 
-def get_cmap(n, name='hsv'):
-    '''Returns a function that maps each index in 0, 1, ..., n-1 to a distinct 
-    RGB color; the keyword argument name must be a standard mpl colormap name.'''
-    return plt.cm.get_cmap(name, n)
+def get_cmap():
+    return cycle('bgrcmk')
 
 listOfNames = getKeypointNames(df.columns)
 numOfKeyPoints = len(getKeyPoints(df.columns))
-cmap = get_cmap(numOfKeyPoints)
+cmap = get_cmap()
 
 listOfKeyPoints_x = ["/topic_transform/keypoints/" + str(i) + "/points/point/x" for i in range(numOfKeyPoints)]
 listOfKeyPoints_y = ["/topic_transform/keypoints/" + str(i) + "/points/point/y" for i in range(numOfKeyPoints)]
@@ -67,7 +66,7 @@ fig = plt.figure()
 ax = Axes3D(fig)
 
 for i, (list_x, list_y, list_z) in enumerate(zip(new_listOfKeyPoints_x, new_listOfKeyPoints_y, new_listOfKeyPoints_z)):
-	ax.scatter(new_df[list_x], new_df[list_y], new_df[list_z], color=cmap(i), label=new_listOfNames[i]) 
+	ax.scatter(new_df[list_x], new_df[list_y], new_df[list_z], color=cmap.next(), label=new_listOfNames[i]) 
 
 ax.set_xlabel('x-axis')
 ax.set_ylabel('y-axis')
