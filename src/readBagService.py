@@ -4,6 +4,7 @@ import roslib, rospy, rosbag
 from std_srvs.srv import Empty,EmptyResponse, Trigger
 import sys
 from rosgraph_msgs.msg import Clock, Log
+from tf2_msgs.msg import TFMessage
 
 class BagByService():
 

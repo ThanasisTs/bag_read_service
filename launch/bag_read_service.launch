@@ -2,7 +2,7 @@
 <launch>
 	<node pkg="bag_read_service" type="readBagService.py" name="BagServer" output="screen">
 		 <!-- <param name="bag_file" value="/home/liger/temp-rosbags/reaching_x1.bag" /> -->
-		 <param name="bag_file" value="/home/liger/depth_checker_bags/depth_checker_static.bag" />	 
+		 <param name="bag_file" value="/home/liger/depth_checker_bags/depth_checker_move.bag" />	 
 	</node>
 
 	<node pkg="bag_read_service" type="clientBag.py" name="BagClient" output="screen">
