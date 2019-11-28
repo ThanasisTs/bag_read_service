@@ -3,7 +3,7 @@ from sensor_msgs.msg import Image, PointCloud2, CameraInfo
 import roslib, rospy, rosbag
 from std_srvs.srv import Empty,EmptyResponse, Trigger
 import sys
-from rosgraph_msgs.msg import Clock
+from rosgraph_msgs.msg import Clock, Log
 
 class BagByService():
 
@@ -14,15 +14,15 @@ class BagByService():
         self.messages = {}
         self.listOfCounts = {}
         self.listOfEndConditions = {}
-        self.msg_types = [CameraInfo, Image, Image, PointCloud2, Clock]
+        # self.msg_types = [CameraInfo, Image, Image, PointCloud2, Clock]
 
         #Create a publisher for each topic
-        self.topics, _ = self.get_topic_and_type_list()
+        self.topics, self.msg_types = self.get_topic_and_type_list()
 
-        for topic, msg_type in zip(self.topics, self.msg_types):
+        for topic in self.topics:
 
             # create list of publishers for each topic
-            self.publishers[topic] = rospy.Publisher(topic, msg_type, queue_size = 10)
+            self.publishers[topic] = rospy.Publisher(topic, self.msg_types[topic], queue_size = 10)
 
             # create a list of messages for each topic
             self.messages[topic] = self.bag.read_messages(topics= topic)
@@ -39,21 +39,16 @@ class BagByService():
 
     def get_topic_and_type_list(self):
         # retrieve a list of topics from the rosbag file
-        topics = self.bag.get_type_and_topic_info()[1].keys()
-
+        info = self.bag.get_type_and_topic_info()
+        topics = list(info[1].keys())
         # retrieve a list of message types from the rosbag file
         # NOT WORKING PROPERLY | USE THE HARD-CODED LIST
-        types=[]
-        for i in range(0,len(self.bag.get_type_and_topic_info()[1].values())):
-            types.append(self.bag.get_type_and_topic_info()[1].values()[i][0])
-
-        result_topic = []  
-        result_type = []  
-        for to,ty in zip(topics,types):
-            result_topic.append(to)
-            result_type.append(ty)
-
-        return result_topic, result_type 
+        types = {}
+        for topic in topics:
+            types[topic] = eval((info[1][topic][0]).split("/")[1])
+        # print types
+        # input()
+        return topics, types 
 
     def pub_next_msg(self):
         for topic in self.topics:
