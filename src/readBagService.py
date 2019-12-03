@@ -5,6 +5,7 @@ from std_srvs.srv import Empty,EmptyResponse, Trigger
 import sys
 from rosgraph_msgs.msg import Clock, Log
 from tf2_msgs.msg import TFMessage
+from keypoint_3d_matching_msgs.msg import Keypoint3d_list, Keypoint3d
 
 class BagByService():
 
@@ -52,17 +53,18 @@ class BagByService():
         return topics, types 
 
     def pub_next_msg(self):
+        time = None
         for topic in self.topics:
             try:
                 _, msg, t = self.messages[topic].next()
             except:
                 self.listOfEndConditions[topic] = True
                 continue
-            if topic == "/camera/rgb/image_raw":
-                self.clockPublisher.publish(t)
-
+            if time is None:
+                time = t
             self.publishers[topic].publish(msg)
             self.listOfCounts[topic] += 1
+        self.clockPublisher.publish(time)
 
     def service(self, req):
         try:
