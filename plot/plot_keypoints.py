@@ -11,6 +11,11 @@ import numpy as np
 from itertools import cycle
 from matplotlib.patches import Polygon
 
+def blacklist():
+	blacklist_x = [-0.153134927441, -0.180600002403]
+	blacklist_y = [0.929576465814, 0.986484451679]
+	return blacklist_x, blacklist_y
+
 # Function to extract all the distinct keypoints from a csv 
 def getKeyPoints(columns): 
 	columns = string.join(columns)
@@ -27,6 +32,18 @@ def getKeypointNames(df):
 
 def get_cmap():
     return cycle('bgrcmk')
+
+def removeBlacklist(df, listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z, new_listOfNames):
+	b_list = blacklist()
+
+	for point_x in listOfKeyPoints_x:
+		df.drop(df.loc[df[point_x].isin(b_list[0])].index, inplace=True)
+
+	for point_y in listOfKeyPoints_y:
+		df.drop(df.loc[df[point_y].isin(b_list[1])].index, inplace=True)
+
+	return df, listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z, new_listOfNames
+
 
 def keypointExtractor(filename):
 	df = pd.read_csv(filename)
@@ -58,40 +75,49 @@ def keypointExtractor(filename):
 				new_df[col] = df[col]
 	# replace zero values with NAN so they do not plot
 	new_df.replace(0, np.nan, inplace=True)
+	return removeBlacklist(new_df, listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z, new_listOfNames)
 
-	return new_df, listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z, new_listOfNames
+	#return new_df, listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z, new_listOfNames
 
 def extractAperture(filename):
 	df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z,_ = keypointExtractor(filename)
+	df.to_csv("temp.csv")
 	# calculate aperture
 	aperture = []
 	point_list = []
 	for keypoint_x, keypoint_y in zip(new_listOfKeyPoints_x, new_listOfKeyPoints_y):
 		point_list.append([df[keypoint_x].values, df[keypoint_y].values])
 
-
 	aperture_x = np.absolute(point_list[0][0] - point_list[1][0])
 	aperture_y = np.absolute(point_list[0][1] - point_list[1][1])
-	return aperture_x, aperture_y
-	# mean_x = np.mean(aperture_x)
-	# std_x = np.std(aperture_x)
-	# mean_y = np.mean(aperture_y)
-	# std_y = np.std(aperture_y)
+
+	# euclidean distance
+	aperture = np.sqrt(np.subtract(np.power(aperture_x, 2), np.power(aperture_y,2)))
+	aperture = aperture[~np.isnan(aperture)]
+	return aperture
 
 def boxPlot():
-	path = '/home/liger/depth_checker_keypoints_tf/'
-	filenames = ['aperture_5cm_keypoints_tf.csv', 'aperture_10cm_keypoints_tf.csv', 'aperture_15cm_keypoints_tf.csv']
+	#path = '/home/liger/depth_checker_keypoints_tf/'
+	# filenames = ['aperture_5cm_keypoints_tf.csv', 'aperture_10cm_keypoints_tf.csv', 'aperture_15cm_keypoints_tf.csv']
 
-	aperture_x_5, _ = extractAperture(path+filenames[0])
-	aperture_x_10, _ = extractAperture(path+filenames[1])
-	aperture_x_15, _ = extractAperture(path+filenames[2])
+	filenames = sys.argv[2:]
+	# aperture_x_5, _ = extractAperture(path+filenames[0])
+	# aperture_x_10, _ = extractAperture(path+filenames[1])
+	# aperture_x_15, _ = extractAperture(path+filenames[2])
 	
-	data = [aperture_x_5, aperture_x_10, aperture_x_15]
-	data_cm = [aperture_x_5*100, aperture_x_10*100, aperture_x_15*100]
-	aperture_size = ['5cm', '10cm', '15cm']
-	msgsPerFile = ["141", "99", "125"]
-	img_raw_msgs = ["146", "101", "129"]
-	pc_msgs = ["142", "100", "125"]
+	apertures = [extractAperture(filename) for filename in filenames]
+
+	# data = [aperture_x_5, aperture_x_10, aperture_x_15]
+	data_cm = [aperture * 100 for aperture in apertures] 
+	aperture_size = ['5cm', '4cm', '3cm', '2cm']
+	msgsPerFile = ["178", "174", "204", "198"]
+	img_raw_msgs = ["178", "176", "206", "200"]
+	pc_msgs = ["180", "174", "204", "198"]
+
+	# aperture_size = ['5cm', '10cm', '15cm']
+	# msgsPerFile = ["141", "99", "125"]
+	# img_raw_msgs = ["146", "101", "129"]
+	# pc_msgs = ["142", "100", "125"]
 
 	labels = [ap+"\nTotal messages: "+msg for ap, msg in zip(aperture_size, msgsPerFile)]
 
@@ -117,9 +143,9 @@ def boxPlot():
 
 	# Now fill the boxes with desired colors
 	box_colors = ['darkkhaki', 'royalblue']
-	num_boxes = len(data)
-	means = [np.mean(keypoint) for keypoint in data]
-	stds = [np.std(keypoint) for keypoint in data]
+	num_boxes = len(data_cm)
+	means = [np.mean(keypoint) for keypoint in data_cm]
+	stds = [np.std(keypoint) for keypoint in data_cm]
 
 	for i in range(num_boxes):
 	    box = bp['boxes'][i]
@@ -184,7 +210,7 @@ def plot():
 	#     r'$\vec{\sigma}_{thumb}=[%.2f, %.2f]$' % (std_x[0], std_y[0])))
 
 	# textstr = "Groundtruth Index = [-0.30, -0.00]"
-	textstr = '\n'.join(("Groundtruth Thumb = [-0.30, 0.00]",
+	textstr = '\n'.join(("Groundtruth Thumb = [-0.29, 0.00]",
 	    "Groundtruth Index = [-0.25, 0.00]"))
 	# these are matplotlib.patch.Patch properties
 	props = dict(facecolor='white', alpha=0.5)
@@ -198,13 +224,10 @@ def plot():
 	plt.show()
 
 if __name__== "__main__":
-	try:
-		if sys.argv[1] == "boxplot":
-			boxPlot()
-		elif sys.argv[1] == "plotkeypoints":
-			plot()
-		else:
-			print("Wrong keyword.")
-			print("Select \"boxplot\" or \"plotkeypoints\".")
-	except:
-			print("Select \"boxplot\" or \"plotkeypoints\".")
+	if sys.argv[1] == "boxplot":
+		boxPlot()
+	elif sys.argv[1] == "plotkeypoints":
+		plot()
+	else:
+		print("Wrong keyword.")
+		print("Select \"boxplot\" or \"plotkeypoints\".")
