@@ -10,10 +10,11 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 from itertools import cycle
 from matplotlib.patches import Polygon
+from scipy import stats
 
 def blacklist():
-	blacklist_x = [-0.153134927441, -0.180600002403]
-	blacklist_y = [0.929576465814, 0.986484451679]
+	blacklist_x = np.array([-0.153134927441, -0.180600002403])
+	blacklist_y = np.array([0.929576465814, 0.986484451679])
 	return blacklist_x, blacklist_y
 
 # Function to extract all the distinct keypoints from a csv 
@@ -37,10 +38,10 @@ def removeBlacklist(df, listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z,
 	b_list = blacklist()
 
 	for point_x in listOfKeyPoints_x:
-		df.drop(df.loc[df[point_x].isin(b_list[0])].index, inplace=True)
+		df.drop(df.loc[df[point_x].isin(np.around(b_list[0], decimals=7))].index, inplace=True)
 
 	for point_y in listOfKeyPoints_y:
-		df.drop(df.loc[df[point_y].isin(b_list[1])].index, inplace=True)
+		df.drop(df.loc[df[point_y].isin(np.around(b_list[1], decimals=7))].index, inplace=True)
 
 	return df, listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z, new_listOfNames
 
@@ -72,16 +73,18 @@ def keypointExtractor(filename):
 			new_listOfNames.append(listOfNames[i])
 
 			for col in point_list_names:
-				new_df[col] = df[col]
+				# rounding is crucial for comparing
+				new_df[col] = df[col].astype(float).round(7)
+
 	# replace zero values with NAN so they do not plot
-	new_df.replace(0, np.nan, inplace=True)
+	new_df.replace(0, np.nan, inplace=True)\
+
 	return removeBlacklist(new_df, listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z, new_listOfNames)
 
 	#return new_df, listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z, new_listOfNames
 
 def extractAperture(filename):
 	df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z,_ = keypointExtractor(filename)
-	df.to_csv("temp.csv")
 	# calculate aperture
 	aperture = []
 	point_list = []
@@ -110,7 +113,7 @@ def boxPlot():
 	# data = [aperture_x_5, aperture_x_10, aperture_x_15]
 	data_cm = [aperture * 100 for aperture in apertures] 
 	aperture_size = ['5cm', '4cm', '3cm', '2cm']
-	msgsPerFile = ["178", "174", "204", "198"]
+	msgsPerFile = ["177", "173", "201", "196"]
 	img_raw_msgs = ["178", "176", "206", "200"]
 	pc_msgs = ["180", "174", "204", "198"]
 
@@ -159,7 +162,7 @@ def boxPlot():
 	    ax1.add_patch(Polygon(box_coords, facecolor=box_colors[i % 2]))
 	# Set the axes ranges and axes labels
 	ax1.set_xlim(0.5, num_boxes + 0.5)
-	top = 15
+	top = 6
 	bottom = 0
 	plt.yticks(np.arange(bottom, top, 1))
 	# ax1.set_ylim(bottom, top)
@@ -177,7 +180,7 @@ def plot():
 		sys.exit()
 
 	new_df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z, new_listOfNames = keypointExtractor(filename)
-
+	new_df.to_csv("~/tmp.csv")
 	# plot 3D scatter of points
 	fig, ax = plt.subplots(figsize=(10, 6))
 	cmap = get_cmap()
@@ -210,7 +213,7 @@ def plot():
 	#     r'$\vec{\sigma}_{thumb}=[%.2f, %.2f]$' % (std_x[0], std_y[0])))
 
 	# textstr = "Groundtruth Index = [-0.30, -0.00]"
-	textstr = '\n'.join(("Groundtruth Thumb = [-0.29, 0.00]",
+	textstr = '\n'.join(("Groundtruth Thumb = [-0.30, 0.00]",
 	    "Groundtruth Index = [-0.25, 0.00]"))
 	# these are matplotlib.patch.Patch properties
 	props = dict(facecolor='white', alpha=0.5)
