@@ -77,7 +77,10 @@ def keypointExtractor(filename):
 				new_df[col] = df[col].astype(float).round(7)
 
 	# replace zero values with NAN so they do not plot
-	new_df.replace(0, np.nan, inplace=True)\
+	new_df.replace(0, np.nan, inplace=True)
+
+	# remove outliers
+	new_df = new_df[(np.abs(stats.zscore(new_df)) < 2).all(axis=1)]
 
 	return removeBlacklist(new_df, listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z, new_listOfNames)
 
@@ -85,6 +88,7 @@ def keypointExtractor(filename):
 
 def extractAperture(filename):
 	df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z,_ = keypointExtractor(filename)
+
 	# calculate aperture
 	aperture = []
 	point_list = []
@@ -162,8 +166,8 @@ def boxPlot():
 	    ax1.add_patch(Polygon(box_coords, facecolor=box_colors[i % 2]))
 	# Set the axes ranges and axes labels
 	ax1.set_xlim(0.5, num_boxes + 0.5)
-	top = 6
-	bottom = 0
+	top = 13
+	bottom = 1
 	plt.yticks(np.arange(bottom, top, 1))
 	# ax1.set_ylim(bottom, top)
 	#plt.ticklabel_format(axis='y', style='sci', scilimits=(bottom,top))
