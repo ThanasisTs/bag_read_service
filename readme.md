@@ -1,6 +1,6 @@
 ### Description
 
-Open a __new terminal__ and run an openpose_utils launch file.
+Open a __new terminal__ and run an [openpose_utils](https://github.com/Roboskel-Manipulation/openpose_utils) launch file.
 Example: 
         roslaunch openpose_utils_launch openpose_sole.launch
 
