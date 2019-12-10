@@ -27,16 +27,23 @@ Finally, in a __new terminal__ we play the rosbag containing the 3D keypoints:
 
         rosbag play keypoints.bag
 
-# Plot 3D Keypoints
-
+# Plot Keypoints on the 2D plane (no z axis)
 
 
 When the keypoints.bag is ready we convert it into a csv file using the [rosbag_pandas](https://github.com/eurogroep/rosbag_pandas) library.
 
         python bag_csv -b ~/keypoints_tf.bag -o ~/keypoints_tf.csv
 
-Finally we run the `plot_keypoints.py` file with the name of the csv file as argument to obtain the plot of the 3d points.
+Finally we run the `plot_keypoints.py` file with the "plotkeypoints" argument and the name of the csv file as argument to obtain the plot of the 3d points.
 
-        python plot/plot_keypoints.py ~/keypoints_tf.csv 
+        python plot/plot_keypoints.py plotkeypoints ~/keypoints_tf.csv 
 
-![Plot](keypoints_base_link.png)
+![Plot](fingertips.png)
+
+# Boxplots of Keypoint Apertures
+
+There is also a Boxplot option for the apertire between finger tips using the argument "boxplot" with `plot_keypoints.py`
+
+        python plot/plot_keypoints.py boxplot ~/keypoints_aperture1_tf.csv ~/keypoints_aperture2_tf.csv 
+
+![Plot](boxplot.png)
