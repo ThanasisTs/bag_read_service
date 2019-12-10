@@ -1,4 +1,11 @@
 #!/usr/bin/env python
+
+"""
+Server providing the service of reading a rosbag file on demand.
+On a call of /next_msg either by a client or just "rosservice call /next_msg" in a terminal
+the Server reads the next message for each topic in the rosbag file and publishes them on their topics
+"""
+
 from sensor_msgs.msg import Image, PointCloud2, CameraInfo
 import roslib, rospy, rosbag
 from std_srvs.srv import Empty,EmptyResponse, Trigger
@@ -7,7 +14,11 @@ from rosgraph_msgs.msg import Clock, Log
 from tf2_msgs.msg import TFMessage
 from keypoint_3d_matching_msgs.msg import Keypoint3d_list, Keypoint3d
 
-class BagByService():
+__author__ = "Lygerakis Fotios"
+__license__ = "GPL"
+__email__ = "ligerfotis@gmail.com"
+
+class ReadRosBagService():
 
     def __init__(self, bagfile):
         self.bag = rosbag.Bag(bagfile, 'r')
@@ -82,14 +93,14 @@ if __name__=='__main__':
     bag_file = rospy.get_param('~bag_file') 
     #bag_file = sys.argv[1]
     #run this file with the name of the bag file
-    bbs = BagByService(bag_file)
+    rrbs = ReadRosBagService(bag_file)
 
     while not rospy.is_shutdown():
-        if all(value for value in bbs.listOfEndConditions.values()):
+        if all(value for value in rrbs.listOfEndConditions.values()):
             break
         rospy.spin()
 
-    for topic in bbs.topics:
-        print("Bag Reader: Total published msgs from topic %s: %d "%(topic, bbs.listOfCounts[topic]))
+    for topic in rrbs.topics:
+        print("Bag Reader: Total published msgs from topic %s: %d "%(topic, rrbs.listOfCounts[topic]))
     
-    bbs.bag.close()
+    rrbs.bag.close()
