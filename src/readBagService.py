@@ -62,6 +62,7 @@ class BagByService():
                 continue
             if time is None:
                 time = t
+            # msg.header.stamp = rospy.Time.now()
             self.publishers[topic].publish(msg)
             self.listOfCounts[topic] += 1
         self.clockPublisher.publish(time)
