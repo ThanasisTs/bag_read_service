@@ -13,6 +13,10 @@ from matplotlib.patches import Polygon
 from scipy import stats
 import matplotlib
 
+__author__ = "Lygerakis Fotios"
+__license__ = "GPL"
+__email__ = "ligerfotis@gmail.com"
+
 title = "Index-Thumb Groundtruth With Covered Thumb"
 
 zscore = 3

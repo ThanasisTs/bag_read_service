@@ -5,9 +5,9 @@
 		 <param name="bag_file" value="/home/liger/groundtruth_bag/groundtruth_dip_aperture_085.bag" />	 
 	</node>
 
-<!-- 	<node pkg="bag_read_service" type="clientBag.py" name="BagClient" output="screen">
+	<node pkg="bag_read_service" type="clientBag.py" name="BagClient" output="screen">
 		 <param name="listen_topic" value="/keypoint_3d_matching" />	 
-	</node> -->
+	</node>
 
 	<!-- /topic_transform -->
 	<!-- /keypoint_3d_matching -->
