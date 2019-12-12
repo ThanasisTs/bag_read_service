@@ -1,8 +1,11 @@
 <?xml version="1.0"?>
 <launch>
-<!-- 	<node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="-0.177 0.054 1.033 0.004 0.836 -0.549 0.011 /camera_rgb_optical_frame /base_link 100" />-->	
- <!-- old tf -->
+	<!-- tf for groundtruth_bag/-->
+	<!-- <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="-0.177 0.054 1.033 0.004 0.836 -0.549 0.011 /camera_rgb_optical_frame /base_link 100" />-->	
+ 
+ 	<!-- tf for depth_checker-->
 	<!-- <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="-0.170 0.039 1.040 0.002 0.839 -0.544 0.010 /camera_rgb_optical_frame /base_link 100" /> -->
-	<!-- new tf -->
+	
+	<!-- tf for groundtruth_bag/groundtruth_dip_aperture_085.bag-->
 	<node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="-0.267 0.051 0.974 0.035 0.842 -0.538 0.033 /camera_rgb_optical_frame /base_link 100" />
 </launch>

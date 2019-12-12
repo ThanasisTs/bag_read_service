@@ -19,16 +19,16 @@ __email__ = "ligerfotis@gmail.com"
 
 title = "Index-Thumb Groundtruth With Covered Thumb"
 
-zscore = 3
+zscore = 2.698
 
 top = 15
-bottom = 5	
+bottom = 0	
 
-gt_point_index = [-0.20, 0.07]
+gt_point_index = [-0.2, 0.07]
 gt_point_thumb = [-0.25, 0]
 
-axis_range_x = [-0.26, -0.19]
-axis_range_y = [-0.01, 0.08]
+axis_range_x = [-0.4, 0.20]
+axis_range_y = [-0.2, 0.1]
 step_x = .01
 step_y = .01
 
@@ -66,7 +66,7 @@ def removeBlacklist(df, listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z,
 	return df, listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z, new_listOfNames
 
 
-def keypointExtractor(filename):
+def keypointExtractor(filename, withOutliers):
 	df = pd.read_csv(filename)
 	
 	listOfNames = getKeypointNames(df)
@@ -100,14 +100,15 @@ def keypointExtractor(filename):
 	new_df.replace(0, np.nan, inplace=True)
 
 	# remove outliers
-	new_df = new_df[(np.abs(stats.zscore(new_df)) < zscore).all(axis=1)]
+	if not withOutliers:
+		new_df = new_df[(np.abs(stats.zscore(new_df)) < zscore).all(axis=1)]
 
 	return removeBlacklist(new_df, listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z, new_listOfNames)
 
 	#return new_df, listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z, new_listOfNames
 
 def extractAperture(filename):
-	df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z,_ = keypointExtractor(filename)
+	df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z,_ = keypointExtractor(filename, withOutliers=True)
 
 	# calculate aperture
 	aperture = []
@@ -192,16 +193,6 @@ def boxPlot():
 	#plt.ticklabel_format(axis='y', style='sci', scilimits=(bottom,top))
 	ax.set_xticklabels(labels, fontsize=8)
 
-	textstr = ''.join(("z score: ",
-	    str(zscore)))
-	# these are matplotlib.patch.Patch properties
-	props = dict(facecolor='white', alpha=0.5)
-
-	# place a text box in upper left in axes coords
-	ax.text(0.008, 0.035, textstr, transform=ax.transAxes, fontsize=8,
-	        verticalalignment='top', bbox=props)
-
-	ax.legend()
 	plt.show()
 
 def plot():
@@ -211,7 +202,7 @@ def plot():
 		print("Invalid file name given")
 		sys.exit()
 
-	new_df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z, new_listOfNames = keypointExtractor(filename)
+	new_df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z, new_listOfNames = keypointExtractor(filename, withOutliers=False)
 	new_df.to_csv("~/tmp.csv")
 	# plot 3D scatter of points
 	fig, ax = plt.subplots(figsize=(10, 6))
@@ -245,14 +236,6 @@ def plot():
 	ax.annotate("Ground Truth \nIndex Tip", (gt_points_x[1], gt_points_y[1]))
 
 	plt.errorbar(mean_x, mean_y,  markersize='2',fmt='o', color='black', ecolor='black', ms=20,  mfc='white',label="Mean")
-	textstr = ''.join(("z score: ",
-	    str(zscore)))
-	# these are matplotlib.patch.Patch properties
-	props = dict(facecolor='white', alpha=0.5)
-
-	# place a text box in upper left in axes coords
-	ax.text(0.008, 0.035, textstr, transform=ax.transAxes, fontsize=8,
-	        verticalalignment='top', bbox=props)
 
 	ax.minorticks_on()
 	ax.grid(which='major', linestyle='-', linewidth='0.5', color='black')
