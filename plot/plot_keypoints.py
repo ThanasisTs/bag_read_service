@@ -1,17 +1,12 @@
 import pandas as pd
-from datetime import datetime
-import csv
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 import sys
 import re
 import string
-from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 from itertools import cycle
 from matplotlib.patches import Polygon
 from scipy import stats
-import matplotlib
 
 __author__ = "Lygerakis Fotios"
 __license__ = "GPL"
@@ -19,18 +14,34 @@ __email__ = "ligerfotis@gmail.com"
 
 title = "Index-Thumb Groundtruth With Covered Thumb"
 
-zscore = 2.698
-
+#box plot aperture set
 top = 15
 bottom = 0	
 
+# froundtruth printed on the scatter plot
 gt_point_index = [-0.2, 0.07]
 gt_point_thumb = [-0.25, 0]
 
-axis_range_x = [-0.4, 0.20]
-axis_range_y = [-0.2, 0.1]
+# axes ranges
+axis_range_x = [-0.4, 0.00]
+axis_range_y = [-0.2, 0.2]
+
+# steps for tick printing on the axes
 step_x = .01
 step_y = .01
+
+# used in boxplot | positioned under each box
+aperture_size = ['5cm', '4cm', '3cm', '2cm']
+msgsPerFile = ["177", "173", "201", "196"]
+img_raw_msgs = ["178", "176", "206", "200"]
+pc_msgs = ["180", "174", "204", "198"]
+# aperture_size = ['5cm', '10cm', '15cm']
+# msgsPerFile = ["141", "99", "125"]
+# img_raw_msgs = ["146", "101", "129"]
+# pc_msgs = ["142", "100", "125"]
+
+# the z score value used to filter outliers
+zscore = 2.698
 
 def blacklist():
 	blacklist_x = np.array([-0.153134927441, -0.180600002403, -0.238413722605, -0.194435179098])
@@ -83,8 +94,6 @@ def keypointExtractor(filename, withOutliers):
 	for i, point_list_names in enumerate(zip(listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z)):
 		# check if keypoint contains mostly zero points
 		count_valid_array = [(df[col_point]!=0).sum() for col_point in point_list_names]
-		# print(all([point < numOfKeyPoints/4 for point in count_valid_array]))
-		# input()
 
 		if all([point > numOfKeyPoints/4 for point in count_valid_array]):
 			new_listOfKeyPoints_x.append(point_list_names[0])
@@ -105,8 +114,6 @@ def keypointExtractor(filename, withOutliers):
 
 	return removeBlacklist(new_df, listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z, new_listOfNames)
 
-	#return new_df, listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z, new_listOfNames
-
 def extractAperture(filename):
 	df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z,_ = keypointExtractor(filename, withOutliers=True)
 
@@ -126,26 +133,12 @@ def extractAperture(filename):
 	return aperture
 
 def boxPlot():
-	#path = '/home/liger/depth_checker_keypoints_tf/'
-	# filenames = ['aperture_5cm_keypoints_tf.csv', 'aperture_10cm_keypoints_tf.csv', 'aperture_15cm_keypoints_tf.csv']
 
 	filenames = sys.argv[2:]
-	# aperture_x_5, _ = extractAperture(path+filenames[0])
-	# aperture_x_10, _ = extractAperture(path+filenames[1])
-	# aperture_x_15, _ = extractAperture(path+filenames[2])
 	
 	apertures = [extractAperture(filename) for filename in filenames]
-	# data = [aperture_x_5, aperture_x_10, aperture_x_15]
-	data_cm = [aperture * 100 for aperture in apertures] 
-	aperture_size = ['5cm', '4cm', '3cm', '2cm']
-	msgsPerFile = ["177", "173", "201", "196"]
-	img_raw_msgs = ["178", "176", "206", "200"]
-	pc_msgs = ["180", "174", "204", "198"]
 
-	# aperture_size = ['5cm', '10cm', '15cm']
-	# msgsPerFile = ["141", "99", "125"]
-	# img_raw_msgs = ["146", "101", "129"]
-	# pc_msgs = ["142", "100", "125"]
+	data_cm = [aperture * 100 for aperture in apertures] 
 
 	labels = [ap+"\nTotal messages: "+msg for ap, msg in zip(aperture_size, msgsPerFile)]
 
@@ -189,8 +182,6 @@ def boxPlot():
 	ax.set_xlim(0.5, num_boxes + 0.5)
 
 	plt.yticks(np.arange(bottom, top, 1))
-	# ax.set_ylim(bottom, top)
-	#plt.ticklabel_format(axis='y', style='sci', scilimits=(bottom,top))
 	ax.set_xticklabels(labels, fontsize=8)
 
 	plt.show()
@@ -204,7 +195,7 @@ def plot():
 
 	new_df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z, new_listOfNames = keypointExtractor(filename, withOutliers=False)
 	new_df.to_csv("~/tmp.csv")
-	# plot 3D scatter of points
+
 	fig, ax = plt.subplots(figsize=(10, 6))
 	cmap = get_cmap()
 	scat = None
