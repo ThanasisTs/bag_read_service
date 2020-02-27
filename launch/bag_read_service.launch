@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <launch>
 	<node pkg="bag_read_service" type="readBagService.py" name="BagServer" output="screen">
-		 <!-- <param name="bag_file" value="/home/liger/temp-rosbags/reaching_x1.bag" /> -->
-		 <param name="bag_file" value="/home/liger/groundtruth_bag/groundtruth_dip_aperture_085.bag" />	 
+		 <!-- <param name="bag_file" value="/home/ligerfotis/CSE6963_rosbag_data/rgbd/test_static_fingers.bag" /> -->
+		 <param name="bag_file" value="/home/ligerfotis/CSE6963_rosbag_data/Patient0/i5.bag" />	 
 	</node>
 
 	<node pkg="bag_read_service" type="clientBag.py" name="BagClient" output="screen">

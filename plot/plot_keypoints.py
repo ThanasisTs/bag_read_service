@@ -12,33 +12,42 @@ __author__ = "Lygerakis Fotios"
 __license__ = "GPL"
 __email__ = "ligerfotis@gmail.com"
 
-title = "Index-Thumb Groundtruth With Covered Thumb"
+title = "Index-Thumb Groundtruth"
 
 #box plot aperture set
-top = 15
+top = 6
 bottom = 0	
 
-# froundtruth printed on the scatter plot
-gt_point_index = [-0.2, 0.07]
-gt_point_thumb = [-0.25, 0]
+# Ground truth points
+# Marker Frame
+A = [-34.60, 29.52]
+B = [-44.76, 21.90]
+C = [-29.52, 37.14]
+D = [-29.52, 24.44]
+I = [-38.09, 15.87]
+T1 = [-37.46, 16.50]
+T2 = [-36.19, 17.30]
+T3 = [-36.03, 18.09]
+T4 = [-35.40, 18.57]
+T5 = [-34.60, 19.36]
 
-# axes ranges
-axis_range_x = [-0.4, 0.00]
-axis_range_y = [-0.2, 0.2]
+# froundtruth printed on the scatter plot
+gt_point_index = I 
+gt_point_thumb = T5
+
+# axes rangeD
+axis_range_x = [-0.5, -0.28]
+axis_range_y = [0.10, 0.40]
 
 # steps for tick printing on the axes
 step_x = .01
 step_y = .01
 
 # used in boxplot | positioned under each box
-aperture_size = ['5cm', '4cm', '3cm', '2cm']
-msgsPerFile = ["177", "173", "201", "196"]
+aperture_size = ['1cm', '2cm', '3cm', '4cm', '5cm']
+msgsPerFile = ["291", "288", "290", "289", "291"]
 img_raw_msgs = ["178", "176", "206", "200"]
 pc_msgs = ["180", "174", "204", "198"]
-# aperture_size = ['5cm', '10cm', '15cm']
-# msgsPerFile = ["141", "99", "125"]
-# img_raw_msgs = ["146", "101", "129"]
-# pc_msgs = ["142", "100", "125"]
 
 # the z score value used to filter outliers
 zscore = 2.698
@@ -50,7 +59,7 @@ def blacklist():
 
 # Function to extract all the distinct keypoints from a csv 
 def getKeyPoints(columns): 
-	columns = string.join(columns)
+	columns = "".join(columns)
 	array = re.findall(r"/topic_transform/keypoints/[0-9]+/points/point/x", columns)
 	return array 
 
@@ -199,8 +208,9 @@ def plot():
 	fig, ax = plt.subplots(figsize=(10, 6))
 	cmap = get_cmap()
 	scat = None
+	color = 'brgcmk'
 	for i, (list_x, list_y) in enumerate(zip(new_listOfKeyPoints_x, new_listOfKeyPoints_y)):
-		scat = plt.scatter(new_df[list_x], new_df[list_y], s=0.7, color=cmap.next(), label=new_listOfNames[i]) 
+		scat = plt.scatter(new_df[list_x], new_df[list_y], s=0.7, color=color[i], label=new_listOfNames[i]) 
 
 	fig.suptitle(title)
 	ax.set_xlabel('x-axis (in m)')
@@ -221,12 +231,12 @@ def plot():
 	gt_points_x = [gt_point_index[0], gt_point_thumb[0]]
 	gt_points_y = [gt_point_index[1], gt_point_thumb[1]]
 
-	plt.scatter(gt_points_x, gt_points_y, s=15, color=cmap.next())
+	plt.scatter(gt_points_x, gt_points_y, s=15, color=color[-1])
 
 	ax.annotate("Ground Truth \nThumb Tip", (gt_points_x[0], gt_points_y[0]))
 	ax.annotate("Ground Truth \nIndex Tip", (gt_points_x[1], gt_points_y[1]))
 
-	plt.errorbar(mean_x, mean_y,  markersize='2',fmt='o', color='black', ecolor='black', ms=20,  mfc='white',label="Mean")
+	plt.errorbar(mean_x, mean_y,  markersize=2,fmt='o', color='black', ecolor='black', ms=20,  mfc='white',label="Mean")
 
 	ax.minorticks_on()
 	ax.grid(which='major', linestyle='-', linewidth='0.5', color='black')
