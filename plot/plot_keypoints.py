@@ -18,6 +18,9 @@ title = "Index-Thumb Groundtruth"
 top = 6
 bottom = 0	
 
+# plot the average every frameAvg points
+frameAvg = 7
+
 # Ground truth points
 # Marker Frame
 A = [-34.60, 29.52, 0.0]
@@ -200,7 +203,8 @@ def print2dPlot( axis1, axis2, new_df, new_listOfKeyPoints_x,new_listOfKeyPoints
 		new_listOfKeyPoints_ax2 = new_listOfKeyPoints_z
 	
 	for i, (list_ax1, list_ax2) in enumerate(zip(new_listOfKeyPoints_ax1, new_listOfKeyPoints_ax2)):
-		scat = plt.scatter(new_df[list_ax1], new_df[list_ax2], s=0.7, color=color[i], label=new_listOfNames[i]) 
+		avglist1, avglist2 = getAvg(new_df[list_ax1], new_df[list_ax2], frameAvg)
+		scat = plt.scatter(avglist1, avglist2, s=0.7, color=color[i], label=new_listOfNames[i]) 
 
 	fig.suptitle(title)
 	ax.set_xlabel( axis1 + '-axis (in m)')
@@ -258,7 +262,20 @@ def print2dPlot( axis1, axis2, new_df, new_listOfKeyPoints_x,new_listOfKeyPoints
 	ax.legend(markerscale=5)
 	plt.show()
 
+'''
+	get an average of the point over avgNum frames
+'''
+def getAvg( array1, array2, avgNum = 2):
+	new_array1 = []
+	new_array2 = []
 
+	for i in range(0, len(array1)-avgNum):
+
+		step = i + avgNum
+		new_array1.append(np.mean( array1[i:step]) ) 
+		new_array2.append(np.mean( array2[i:step]))
+
+	return new_array1, new_array2
 
 def plot():
 	try:
