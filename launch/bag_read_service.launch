@@ -2,7 +2,7 @@
 <launch>
 	<node pkg="bag_read_service" type="readBagService.py" name="BagServer" output="screen">
 		 <!-- <param name="bag_file" value="/home/ligerfotis/CSE6963_rosbag_data/rgbd/test_static_fingers.bag" /> -->
-		 <param name="bag_file" value="/home/ligerfotis/CSE6963_rosbag_data/Patient0/i5.bag" />	 
+		 <param name="bag_file" value="/home/ligerfotis/CSE6963_rosbag_data/z_axis/fh.bag" />	 
 	</node>
 
 	<node pkg="bag_read_service" type="clientBag.py" name="BagClient" output="screen">

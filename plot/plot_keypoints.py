@@ -20,28 +20,30 @@ bottom = 0
 
 # Ground truth points
 # Marker Frame
-A = [-34.60, 29.52]
-B = [-44.76, 21.90]
-C = [-29.52, 37.14]
-D = [-29.52, 24.44]
-I = [-38.09, 15.87]
-T1 = [-37.46, 16.50]
-T2 = [-36.19, 17.30]
-T3 = [-36.03, 18.09]
-T4 = [-35.40, 18.57]
-T5 = [-34.60, 19.36]
+A = [-34.60, 29.52, 0.0]
+B = [-44.76, 21.90, 0.0]
+C = [-29.52, 37.14, 0.0]
+D = [-29.52, 24.44, 0.0]
+I = [-38.09, 15.87, 0.0]
+T1 = [-37.46, 16.50, 0.0]
+T2 = [-36.19, 17.30, 0.0]
+T3 = [-36.03, 18.09, 0.0]
+T4 = [-35.40, 18.57, 0.0]
+T5 = [-34.60, 19.36, 0.0]
 
 # froundtruth printed on the scatter plot
 gt_point_index = I 
 gt_point_thumb = T5
 
 # axes rangeD
-axis_range_x = [-0.5, -0.28]
+axis_range_x = [-0.6, -0.28]
 axis_range_y = [0.10, 0.40]
+axis_range_z = [0.0, 0.15]
 
 # steps for tick printing on the axes
 step_x = .01
 step_y = .01
+step_z = .01
 
 # used in boxplot | positioned under each box
 aperture_size = ['1cm', '2cm', '3cm', '4cm', '5cm']
@@ -51,11 +53,6 @@ pc_msgs = ["180", "174", "204", "198"]
 
 # the z score value used to filter outliers
 zscore = 2.698
-
-def blacklist():
-	blacklist_x = np.array([-0.153134927441, -0.180600002403, -0.238413722605, -0.194435179098])
-	blacklist_y = np.array([0.929576465814, 0.986484451679, 0.0289434800859, 0.0676014466519])
-	return blacklist_x, blacklist_y
 
 # Function to extract all the distinct keypoints from a csv 
 def getKeyPoints(columns): 
@@ -73,17 +70,6 @@ def getKeypointNames(df):
 
 def get_cmap():
     return cycle('brgcmk')
-
-def removeBlacklist(df, listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z, new_listOfNames):
-	b_list = blacklist()
-
-	for point_x in listOfKeyPoints_x:
-		df.drop(df.loc[df[point_x].isin(np.around(b_list[0], decimals=7))].index, inplace=True)
-
-	for point_y in listOfKeyPoints_y:
-		df.drop(df.loc[df[point_y].isin(np.around(b_list[1], decimals=7))].index, inplace=True)
-
-	return df, listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z, new_listOfNames
 
 
 def keypointExtractor(filename, withOutliers):
@@ -121,7 +107,7 @@ def keypointExtractor(filename, withOutliers):
 	if not withOutliers:
 		new_df = new_df[(np.abs(stats.zscore(new_df)) < zscore).all(axis=1)]
 
-	return removeBlacklist(new_df, listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z, new_listOfNames)
+	return new_df, listOfKeyPoints_x, listOfKeyPoints_y, listOfKeyPoints_z, new_listOfNames
 
 def extractAperture(filename):
 	df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z,_ = keypointExtractor(filename, withOutliers=True)
@@ -195,6 +181,85 @@ def boxPlot():
 
 	plt.show()
 
+def print2dPlot( axis1, axis2, new_df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z, new_listOfNames):
+
+	fig, ax = plt.subplots(figsize=(10, 6))
+	cmap = get_cmap()
+	scat = None
+	color = 'brgcmk'
+
+	if ( [axis1, axis2] == ['x', 'y']):
+		new_listOfKeyPoints_ax1 = new_listOfKeyPoints_x
+		new_listOfKeyPoints_ax2 = new_listOfKeyPoints_y
+	elif ( [axis1, axis2] == ['x', 'z']):
+		new_listOfKeyPoints_ax1 = new_listOfKeyPoints_x
+		new_listOfKeyPoints_ax2 = new_listOfKeyPoints_z
+
+	elif ( [axis1, axis2] == ['y', 'z']):
+		new_listOfKeyPoints_ax1 = new_listOfKeyPoints_y
+		new_listOfKeyPoints_ax2 = new_listOfKeyPoints_z
+	
+	for i, (list_ax1, list_ax2) in enumerate(zip(new_listOfKeyPoints_ax1, new_listOfKeyPoints_ax2)):
+		scat = plt.scatter(new_df[list_ax1], new_df[list_ax2], s=0.7, color=color[i], label=new_listOfNames[i]) 
+
+	fig.suptitle(title)
+	ax.set_xlabel( axis1 + '-axis (in m)')
+	ax.set_ylabel( axis2 + '-axis (in m)')
+
+
+	if ( [axis1, axis2] == ['x', 'y']):
+		plt.xticks(np.arange(axis_range_x[0], axis_range_x[1], step=step_x))
+		plt.yticks(np.arange(axis_range_y[0], axis_range_y[1], step=step_y))
+		ax.set_xlim(axis_range_x)
+		ax.set_ylim(axis_range_y)
+
+		# get two gaussian random numbers, mean=0, std=1, 2 numbers
+		gt_points_ax1 = [gt_point_index[0], gt_point_thumb[0]]
+		gt_points_ax2 = [gt_point_index[1], gt_point_thumb[1]]
+
+	elif ( [axis1, axis2] == ['x', 'z']):
+		plt.xticks(np.arange(axis_range_x[0], axis_range_x[1], step=step_x))
+		plt.yticks(np.arange(axis_range_z[0], axis_range_z[1], step=step_z))
+		ax.set_xlim(axis_range_x)
+		ax.set_ylim(axis_range_z)
+
+		# get two gaussian random numbers, mean=0, std=1, 2 numbers
+		gt_points_ax1 = [gt_point_index[0], gt_point_thumb[0]]
+		gt_points_ax2 = [gt_point_index[2], gt_point_thumb[2]]
+
+	elif ( [axis1, axis2] == ['y', 'z']):
+		plt.xticks(np.arange(axis_range_y[0], axis_range_y[1], step=step_y))
+		plt.yticks(np.arange(axis_range_z[0], axis_range_z[1], step=step_z))
+		ax.set_xlim(axis_range_y)
+		ax.set_ylim(axis_range_z)
+
+		# get two gaussian random numbers, mean=0, std=1, 2 numbers
+		gt_points_ax1 = [gt_point_index[1], gt_point_thumb[1]]
+		gt_points_ax2 = [gt_point_index[2], gt_point_thumb[2]]
+	
+
+	mean_ax1 = np.mean(new_df[new_listOfKeyPoints_ax1])
+	mean_ax2 = np.mean(new_df[new_listOfKeyPoints_ax2])
+	std_ax1 = np.std(new_df[new_listOfKeyPoints_ax1])
+	std_ax2 = np.std(new_df[new_listOfKeyPoints_ax2])
+
+
+	plt.scatter(gt_points_ax1, gt_points_ax2, s=15, color=color[-1])
+
+	ax.annotate("Ground Truth \nThumb Tip", (gt_points_ax1[0], gt_points_ax2[0]))
+	ax.annotate("Ground Truth \nIndex Tip", (gt_points_ax1[1], gt_points_ax2[1]))
+
+	plt.errorbar(mean_ax1, mean_ax2,  markersize=2,fmt='o', color='black', ecolor='black', ms=20,  mfc='white',label="Mean")
+
+	ax.minorticks_on()
+	ax.grid(which='major', linestyle='-', linewidth='0.5', color='black')
+	ax.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
+	
+	ax.legend(markerscale=5)
+	plt.show()
+
+
+
 def plot():
 	try:
 		filename = sys.argv[2]
@@ -205,45 +270,9 @@ def plot():
 	new_df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z, new_listOfNames = keypointExtractor(filename, withOutliers=False)
 	new_df.to_csv("~/tmp.csv")
 
-	fig, ax = plt.subplots(figsize=(10, 6))
-	cmap = get_cmap()
-	scat = None
-	color = 'brgcmk'
-	for i, (list_x, list_y) in enumerate(zip(new_listOfKeyPoints_x, new_listOfKeyPoints_y)):
-		scat = plt.scatter(new_df[list_x], new_df[list_y], s=0.7, color=color[i], label=new_listOfNames[i]) 
-
-	fig.suptitle(title)
-	ax.set_xlabel('x-axis (in m)')
-	ax.set_ylabel('y-axis (in m)')
-
-	plt.xticks(np.arange(axis_range_x[0], axis_range_x[1], step=step_x))
-	plt.yticks(np.arange(axis_range_y[0], axis_range_y[1], step=step_y))
-
-	ax.set_xlim(axis_range_x)
-	ax.set_ylim(axis_range_y)
-
-	mean_x = np.mean(new_df[new_listOfKeyPoints_x])
-	mean_y = np.mean(new_df[new_listOfKeyPoints_y])
-	std_x = np.std(new_df[new_listOfKeyPoints_x])
-	std_y = np.std(new_df[new_listOfKeyPoints_y])
-
-	# get two gaussian random numbers, mean=0, std=1, 2 numbers
-	gt_points_x = [gt_point_index[0], gt_point_thumb[0]]
-	gt_points_y = [gt_point_index[1], gt_point_thumb[1]]
-
-	plt.scatter(gt_points_x, gt_points_y, s=15, color=color[-1])
-
-	ax.annotate("Ground Truth \nThumb Tip", (gt_points_x[0], gt_points_y[0]))
-	ax.annotate("Ground Truth \nIndex Tip", (gt_points_x[1], gt_points_y[1]))
-
-	plt.errorbar(mean_x, mean_y,  markersize=2,fmt='o', color='black', ecolor='black', ms=20,  mfc='white',label="Mean")
-
-	ax.minorticks_on()
-	ax.grid(which='major', linestyle='-', linewidth='0.5', color='black')
-	ax.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
-	
-	ax.legend(markerscale=5)
-	plt.show()
+	print2dPlot( 'x', 'y', new_df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z, new_listOfNames)
+	print2dPlot( 'x', 'z', new_df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z, new_listOfNames)
+	print2dPlot( 'y', 'z', new_df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z, new_listOfNames)
 
 if __name__== "__main__":
 	if sys.argv[1] == "boxplot":
