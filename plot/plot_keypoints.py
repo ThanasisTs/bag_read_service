@@ -6,7 +6,9 @@ import string
 import numpy as np
 from itertools import cycle
 from matplotlib.patches import Polygon
+from matplotlib import colors
 from scipy import stats
+from scipy.spatial import distance
 
 __author__ = "Lygerakis Fotios"
 __license__ = "GPL"
@@ -14,29 +16,41 @@ __email__ = "ligerfotis@gmail.com"
 
 title = "Index-Thumb Groundtruth"
 
+
+plt.rcParams.update({'font.size': 16})
 #box plot aperture set
-top = 6
+top = 5
 bottom = 0	
 
 # plot the average every frameAvg points
-frameAvg = 7
+frameAvg = 3
 
 # Ground truth points
 # Marker Frame
-A = [-34.60, 29.52, 0.0]
-B = [-44.76, 21.90, 0.0]
-C = [-29.52, 37.14, 0.0]
-D = [-29.52, 24.44, 0.0]
-I = [-38.09, 15.87, 0.0]
-T1 = [-37.46, 16.50, 0.0]
-T2 = [-36.19, 17.30, 0.0]
-T3 = [-36.03, 18.09, 0.0]
-T4 = [-35.40, 18.57, 0.0]
-T5 = [-34.60, 19.36, 0.0]
+A = [-.346, .295, .000]
+B = [-.448, .219, .000]
+C = [-.295, .371, .000]
+D = [-.295, .244, .000]
+
+# thumb
+E = [-.4003, .3400, .0175]
+# index
+F = [-.4374, .305, .0404]
+
+G = [-.514, .311, .000]
+H = [-.476, .273, .0254]
+I = [-.381, .159, .000]
+
+T1 = [-.3746, .1650, .000]
+T2 = [-.3619, .1730, .000]
+T3 = [-.3603, .1809, .000]
+T4 = [-.3540, .1857, .000]
+T5 = [-.3460, .1936, .000]
+
 
 # froundtruth printed on the scatter plot
-gt_point_index = I 
-gt_point_thumb = T5
+gt_point_index = E
+gt_point_thumb = F
 
 # axes rangeD
 axis_range_x = [-0.6, -0.28]
@@ -74,6 +88,16 @@ def getKeypointNames(df):
 def get_cmap():
     return cycle('brgcmk')
 
+def addPoint(scat, new_point, c='k'):
+    old_off = scat.get_offsets()
+    new_off = np.concatenate([old_off,np.array(new_point, ndmin=2)])
+    old_c = scat.get_facecolors()
+    new_c = np.concatenate([old_c, np.array(colors.to_rgba(c), ndmin=2)])
+
+    scat.set_offsets(new_off)
+    scat.set_facecolors(new_c)
+
+    scat.axes.figure.canvas.draw_idle()
 
 def keypointExtractor(filename, withOutliers):
 	df = pd.read_csv(filename)
@@ -117,16 +141,34 @@ def extractAperture(filename):
 
 	# calculate aperture
 	aperture = []
-	point_list = []
-	for keypoint_x, keypoint_y in zip(new_listOfKeyPoints_x, new_listOfKeyPoints_y):
-		point_list.append([df[keypoint_x].values, df[keypoint_y].values])
 
-	susbtraction_x = point_list[0][0] - point_list[1][0]
-	substraction_y = point_list[0][1] - point_list[1][1]	
+	# 2 lists the 2 fingers
+	finger1 = np.asarray([df[new_listOfKeyPoints_x[0]].values, df[new_listOfKeyPoints_y[0]].values, df[new_listOfKeyPoints_z[0]].values])
+	finger2 = [df[new_listOfKeyPoints_x[1]].values, df[new_listOfKeyPoints_y[1]].values, df[new_listOfKeyPoints_z[1]].values]
+	
+	
+	avgfinger1 = getAvg(finger1[0], finger1[1], finger1[2], frameAvg)
+	avgfinger2 = getAvg(finger2[0], finger2[1], finger2[2], frameAvg)
+	
+	avgfinger1 = np.transpose(avgfinger1)
+	avgfinger2 = np.transpose(avgfinger2)
+	
+	# for keypoint_x, keypoint_y, keypoint_z in zip(new_listOfKeyPoints_x, new_listOfKeyPoints_y, new_listOfKeyPoints_z):
+	# 	fingers.append([df[keypoint_x].values, df[keypoint_y].values, df[keypoint_z].values])
+	#susbtraction_x = point_list[0][0] - point_list[1][0]
+	#substraction_y = point_list[0][1] - point_list[1][1]	
 
 	# euclidean distance
-	aperture = np.sqrt(np.add(np.power(susbtraction_x, 2), np.power(substraction_y,2)))
-	aperture = aperture[~np.isnan(aperture)]
+	#aperture = np.sqrt(np.add(np.power(susbtraction_x, 2), np.power(substraction_y,2)))
+	#aperture = aperture[~np.isnan(aperture)]
+	for point_f1, point_f2 in zip(avgfinger1, avgfinger2):
+		aperture.append(distance.euclidean(point_f1, point_f2))
+	
+	#print(len(aperture))
+	aperture = np.multiply(aperture,1)
+	#print(len(aperture))
+	
+	#aperture = aperture[~np.isnan(aperture)]
 
 	return aperture
 
@@ -138,10 +180,10 @@ def boxPlot():
 
 	data_cm = [aperture * 100 for aperture in apertures] 
 
-	labels = [ap+"\nTotal messages: "+msg for ap, msg in zip(aperture_size, msgsPerFile)]
+	labels = [ap+"\nMessages:\n"+msg for ap, msg in zip(aperture_size, msgsPerFile)]
 
-	fig, ax = plt.subplots(figsize=(10, 6))
-	fig.canvas.set_window_title('Aperture between Thumb and Index Fingertips in cm')
+	fig, ax = plt.subplots(figsize=(10, 10))
+	fig.canvas.set_window_title('Aperture_Thumb_Fingertips_avg'+str(frameAvg))
 	
 
 	medianprops = dict(linestyle=None, linewidth=0, color='white')
@@ -179,14 +221,16 @@ def boxPlot():
 	# Set the axes ranges and axes labels
 	ax.set_xlim(0.5, num_boxes + 0.5)
 
-	plt.yticks(np.arange(bottom, top, 1))
-	ax.set_xticklabels(labels, fontsize=8)
+	plt.yticks(np.arange(bottom, top, 0.2))
+	ax.set_xticklabels(labels, fontsize=14)
 
 	plt.show()
 
 def print2dPlot( axis1, axis2, new_df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z, new_listOfNames):
 
 	fig, ax = plt.subplots(figsize=(10, 6))
+	fig.canvas.set_window_title(axis1+'-'+axis2+' Coordinates')
+	
 	cmap = get_cmap()
 	scat = None
 	color = 'brgcmk'
@@ -204,7 +248,7 @@ def print2dPlot( axis1, axis2, new_df, new_listOfKeyPoints_x,new_listOfKeyPoints
 	
 	for i, (list_ax1, list_ax2) in enumerate(zip(new_listOfKeyPoints_ax1, new_listOfKeyPoints_ax2)):
 		avglist1, avglist2 = getAvg(new_df[list_ax1], new_df[list_ax2], frameAvg)
-		scat = plt.scatter(avglist1, avglist2, s=0.7, color=color[i], label=new_listOfNames[i]) 
+		scat = ax.scatter(avglist1, avglist2, s=0.7, color=color[i], label=new_listOfNames[i]) 
 
 	fig.suptitle(title)
 	ax.set_xlabel( axis1 + '-axis (in m)')
@@ -247,11 +291,11 @@ def print2dPlot( axis1, axis2, new_df, new_listOfKeyPoints_x,new_listOfKeyPoints
 	std_ax1 = np.std(new_df[new_listOfKeyPoints_ax1])
 	std_ax2 = np.std(new_df[new_listOfKeyPoints_ax2])
 
+	# plot ground truth points
+	#plt.scatter(gt_points_ax1, gt_points_ax2, s=10, color="green",label="Groundtruth")
 
-	plt.scatter(gt_points_ax1, gt_points_ax2, s=15, color=color[-1])
-
-	ax.annotate("Ground Truth \nThumb Tip", (gt_points_ax1[0], gt_points_ax2[0]))
-	ax.annotate("Ground Truth \nIndex Tip", (gt_points_ax1[1], gt_points_ax2[1]))
+	#ax.annotate("Ground Truth \nThumb Tip", (gt_points_ax1[0], gt_points_ax2[0]))
+	#ax.annotate("Ground Truth \nIndex Tip", (gt_points_ax1[1], gt_points_ax2[1]))
 
 	plt.errorbar(mean_ax1, mean_ax2,  markersize=2,fmt='o', color='black', ecolor='black', ms=20,  mfc='white',label="Mean")
 
@@ -265,17 +309,26 @@ def print2dPlot( axis1, axis2, new_df, new_listOfKeyPoints_x,new_listOfKeyPoints
 '''
 	get an average of the point over avgNum frames
 '''
-def getAvg( array1, array2, avgNum = 2):
+def getAvg( array1, array2, array3=None, avgNum = 2):
 	new_array1 = []
 	new_array2 = []
+	new_array3 = []
 
 	for i in range(0, len(array1)-avgNum):
 
 		step = i + avgNum
 		new_array1.append(np.mean( array1[i:step]) ) 
 		new_array2.append(np.mean( array2[i:step]))
+		
+		if array3 is not None:
+			new_array3.append(np.mean( array3[i:step]))
 
-	return new_array1, new_array2
+
+	if array3 is None:	
+		return new_array1, new_array2
+	else:
+		return new_array1, new_array2, new_array3
+
 
 def plot():
 	try:
