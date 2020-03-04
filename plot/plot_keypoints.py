@@ -23,13 +23,14 @@ top = 5
 bottom = 0	
 
 # plot the average every frameAvg points
-frameAvg = 3
+frameAvg = 5
 
 # Ground truth points
-# Marker Frame
+# Index
 A = [-.346, .295, .000]
-B = [-.448, .219, .000]
 C = [-.295, .371, .000]
+# Thumb
+B = [-.448, .219, .000]
 D = [-.295, .244, .000]
 
 # thumb
@@ -37,8 +38,9 @@ E = [-.4003, .3400, .0175]
 # index
 F = [-.4374, .305, .0404]
 
-G = [-.514, .311, .000]
-H = [-.476, .273, .0254]
+G = [-.4755, .2623, .000]
+H = [-.5136, .2977, .0254]
+
 I = [-.381, .159, .000]
 
 T1 = [-.3746, .1650, .000]
@@ -49,7 +51,7 @@ T5 = [-.3460, .1936, .000]
 
 
 # froundtruth printed on the scatter plot
-gt_point_index = E
+gt_point_index = H
 gt_point_thumb = F
 
 # axes rangeD
@@ -207,6 +209,7 @@ def boxPlot():
 	num_boxes = len(data_cm)
 	means = [np.mean(keypoint) for keypoint in data_cm]
 	stds = [np.std(keypoint) for keypoint in data_cm]
+	print (stds)
 
 	for i in range(num_boxes):
 	    box = bp['boxes'][i]
@@ -222,14 +225,17 @@ def boxPlot():
 	ax.set_xlim(0.5, num_boxes + 0.5)
 
 	plt.yticks(np.arange(bottom, top, 0.2))
-	ax.set_xticklabels(labels, fontsize=14)
+	ax.set_xticklabels(labels, fontsize=18)
 
 	plt.show()
 
 def print2dPlot( axis1, axis2, new_df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z, new_listOfNames):
 
 	fig, ax = plt.subplots(figsize=(10, 6))
-	fig.canvas.set_window_title(axis1+'-'+axis2+' Coordinates')
+	gt_index_name = [ k for k,v in globals().items() if v == gt_point_index][0]
+	gt_thumb_name = [ k for k,v in globals().items() if v == gt_point_thumb][0]
+
+	fig.canvas.set_window_title(gt_index_name + gt_thumb_name + "_" + axis1 + axis2)
 	
 	cmap = get_cmap()
 	scat = None
@@ -247,7 +253,7 @@ def print2dPlot( axis1, axis2, new_df, new_listOfKeyPoints_x,new_listOfKeyPoints
 		new_listOfKeyPoints_ax2 = new_listOfKeyPoints_z
 	
 	for i, (list_ax1, list_ax2) in enumerate(zip(new_listOfKeyPoints_ax1, new_listOfKeyPoints_ax2)):
-		avglist1, avglist2 = getAvg(new_df[list_ax1], new_df[list_ax2], frameAvg)
+		avglist1, avglist2 = getAvg(array1=new_df[list_ax1], array2=new_df[list_ax2], avgNum =frameAvg)
 		scat = ax.scatter(avglist1, avglist2, s=0.7, color=color[i], label=new_listOfNames[i]) 
 
 	fig.suptitle(title)
@@ -291,8 +297,16 @@ def print2dPlot( axis1, axis2, new_df, new_listOfKeyPoints_x,new_listOfKeyPoints
 	std_ax1 = np.std(new_df[new_listOfKeyPoints_ax1])
 	std_ax2 = np.std(new_df[new_listOfKeyPoints_ax2])
 
+	print('index point mean'+ axis1 + '-' + axis2 + ':' + str(mean_ax1[0]) + ',' + str(mean_ax2[0]))
+	print('index point sted'+ axis1 + '-' + axis2 + ':' + str(std_ax1[0]) + ',' + str(std_ax2[0]))
+
+
+	print('thumb point mean'+ axis1 + '-' + axis2 + ':' + str(mean_ax1[1]) + ',' + str(mean_ax2[1]))
+	print('thumb point sted'+ axis1 + '-' + axis2 + ':' + str(std_ax1[1]) + ',' + str(std_ax2[1]))
+	#print('Mean and stdev for axis:' + axis2 + 'is: (' + mean_ax2 + ', ' + std_ax2)
+
 	# plot ground truth points
-	#plt.scatter(gt_points_ax1, gt_points_ax2, s=10, color="green",label="Groundtruth")
+	plt.scatter(gt_points_ax1, gt_points_ax2, s=10, color="green",label="Groundtruth")
 
 	#ax.annotate("Ground Truth \nThumb Tip", (gt_points_ax1[0], gt_points_ax2[0]))
 	#ax.annotate("Ground Truth \nIndex Tip", (gt_points_ax1[1], gt_points_ax2[1]))
