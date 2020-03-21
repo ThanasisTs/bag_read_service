@@ -20,10 +20,10 @@ title = "Index-Thumb Groundtruth"
 plt.rcParams.update({'font.size': 16})
 #box plot aperture set
 top = 5
-bottom = 0	
+bottom = 0
 
 # plot the average every frameAvg points
-frameAvg = 5
+frameAvg = 1
 
 # Ground truth points
 # Index
@@ -36,7 +36,7 @@ D = [-.295, .244, .000]
 # thumb
 E = [-.4003, .3400, .0175]
 # index
-F = [-.4374, .305, .0404]
+F = [-.4374, .305, .0254]
 
 G = [-.4755, .2623, .000]
 H = [-.5136, .2977, .0254]
@@ -49,15 +49,17 @@ T3 = [-.3603, .1809, .000]
 T4 = [-.3540, .1857, .000]
 T5 = [-.3460, .1936, .000]
 
+#1 is true
+verbose = 0
 
 # froundtruth printed on the scatter plot
-gt_point_index = H
+gt_point_index = E
 gt_point_thumb = F
 
 # axes rangeD
 axis_range_x = [-0.6, -0.28]
 axis_range_y = [0.10, 0.40]
-axis_range_z = [0.0, 0.15]
+axis_range_z = [-.02, 0.15]
 
 # steps for tick printing on the axes
 step_x = .01
@@ -72,6 +74,10 @@ pc_msgs = ["180", "174", "204", "198"]
 
 # the z score value used to filter outliers
 zscore = 2.698
+
+x_points = []
+y_points = []
+z_points = []
 
 # Function to extract all the distinct keypoints from a csv 
 def getKeyPoints(columns): 
@@ -209,6 +215,9 @@ def boxPlot():
 	num_boxes = len(data_cm)
 	means = [np.mean(keypoint) for keypoint in data_cm]
 	stds = [np.std(keypoint) for keypoint in data_cm]
+	print("means")
+	print (means)
+	print("stdevs")
 	print (stds)
 
 	for i in range(num_boxes):
@@ -240,6 +249,8 @@ def print2dPlot( axis1, axis2, new_df, new_listOfKeyPoints_x,new_listOfKeyPoints
 	cmap = get_cmap()
 	scat = None
 	color = 'brgcmk'
+	point_list1 = [] 
+	point_list2 = []
 
 	if ( [axis1, axis2] == ['x', 'y']):
 		new_listOfKeyPoints_ax1 = new_listOfKeyPoints_x
@@ -253,10 +264,12 @@ def print2dPlot( axis1, axis2, new_df, new_listOfKeyPoints_x,new_listOfKeyPoints
 		new_listOfKeyPoints_ax2 = new_listOfKeyPoints_z
 	
 	for i, (list_ax1, list_ax2) in enumerate(zip(new_listOfKeyPoints_ax1, new_listOfKeyPoints_ax2)):
+		point_list1.append(new_df[list_ax1])
+		point_list2.append(new_df[list_ax2])
 		avglist1, avglist2 = getAvg(array1=new_df[list_ax1], array2=new_df[list_ax2], avgNum =frameAvg)
 		scat = ax.scatter(avglist1, avglist2, s=0.7, color=color[i], label=new_listOfNames[i]) 
 
-	fig.suptitle(title)
+	#fig.suptitle(title)
 	ax.set_xlabel( axis1 + '-axis (in m)')
 	ax.set_ylabel( axis2 + '-axis (in m)')
 
@@ -297,28 +310,32 @@ def print2dPlot( axis1, axis2, new_df, new_listOfKeyPoints_x,new_listOfKeyPoints
 	std_ax1 = np.std(new_df[new_listOfKeyPoints_ax1])
 	std_ax2 = np.std(new_df[new_listOfKeyPoints_ax2])
 
-	print('index point mean'+ axis1 + '-' + axis2 + ':' + str(mean_ax1[0]) + ',' + str(mean_ax2[0]))
-	print('index point sted'+ axis1 + '-' + axis2 + ':' + str(std_ax1[0]) + ',' + str(std_ax2[0]))
+	print('thumb point mean of '+ axis1 + '-' + axis2 + ':' + str(mean_ax1[0]) + ',' + str(mean_ax2[0]))
+	print('thumb point sted of '+ axis1 + '-' + axis2 + ':' + str(std_ax1[0]) + ',' + str(std_ax2[0]))
 
 
-	print('thumb point mean'+ axis1 + '-' + axis2 + ':' + str(mean_ax1[1]) + ',' + str(mean_ax2[1]))
-	print('thumb point sted'+ axis1 + '-' + axis2 + ':' + str(std_ax1[1]) + ',' + str(std_ax2[1]))
+	print('index point mean of'+ axis1 + '-' + axis2 + ':' + str(mean_ax1[1]) + ',' + str(mean_ax2[1]))
+	print('index point sted of'+ axis1 + '-' + axis2 + ':' + str(std_ax1[1]) + ',' + str(std_ax2[1]))
 	#print('Mean and stdev for axis:' + axis2 + 'is: (' + mean_ax2 + ', ' + std_ax2)
 
 	# plot ground truth points
-	plt.scatter(gt_points_ax1, gt_points_ax2, s=10, color="green",label="Groundtruth")
+	plt.scatter(gt_points_ax1, gt_points_ax2, s=30, color="green",label="Groundtruth")
 
 	#ax.annotate("Ground Truth \nThumb Tip", (gt_points_ax1[0], gt_points_ax2[0]))
 	#ax.annotate("Ground Truth \nIndex Tip", (gt_points_ax1[1], gt_points_ax2[1]))
-
-	plt.errorbar(mean_ax1, mean_ax2,  markersize=2,fmt='o', color='black', ecolor='black', ms=20,  mfc='white',label="Mean")
+	if verbose ==1:
+		plt.errorbar(mean_ax1, mean_ax2,  markersize=2,fmt='o', color='black', ecolor='black', ms=20,  mfc='white',label="Mean")
 
 	ax.minorticks_on()
 	ax.grid(which='major', linestyle='-', linewidth='0.5', color='black')
 	ax.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
 	
-	ax.legend(markerscale=5)
+	if verbose==1 :
+		ax.legend(markerscale=5)
 	plt.show()
+
+	return point_list1, point_list2
+
 
 '''
 	get an average of the point over avgNum frames
@@ -354,9 +371,24 @@ def plot():
 	new_df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z, new_listOfNames = keypointExtractor(filename, withOutliers=False)
 	new_df.to_csv("~/tmp.csv")
 
-	print2dPlot( 'x', 'y', new_df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z, new_listOfNames)
-	print2dPlot( 'x', 'z', new_df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z, new_listOfNames)
+	x_points, y_points = print2dPlot( 'x', 'y', new_df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z, new_listOfNames)
+	_, z_points = print2dPlot( 'x', 'z', new_df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z, new_listOfNames)
 	print2dPlot( 'y', 'z', new_df, new_listOfKeyPoints_x,new_listOfKeyPoints_y, new_listOfKeyPoints_z, new_listOfNames)
+
+	dist_t = []
+	dist_i = []
+	# index
+	for point in zip(x_points[0],y_points[0],z_points[0]):
+		dist_i.append(distance.euclidean(point, gt_point_index))
+	# thumb
+	for point in zip(x_points[1],y_points[1],z_points[1]):
+		dist_t.append(distance.euclidean(point, gt_point_thumb))
+
+	print("Mean euclidean distance for thumb")
+	print(np.mean(dist_t))
+
+	print("Mean euclidean distance for index")
+	print(np.mean(dist_i))
 
 if __name__== "__main__":
 	if sys.argv[1] == "boxplot":
