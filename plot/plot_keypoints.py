@@ -23,7 +23,7 @@ top = 5
 bottom = 0	
 
 # plot the average every frameAvg points
-frameAvg = 5
+frameAvg = 1
 
 # Ground truth points
 # Index
@@ -34,9 +34,9 @@ B = [-.448, .219, .000]
 D = [-.295, .244, .000]
 
 # thumb
-E = [-.4003, .3400, .0175]
+E = [-.3718, .321, .0]
 # index
-F = [-.4374, .305, .0404]
+F = [-.4099, .2702, .0254]
 
 G = [-.4755, .2623, .000]
 H = [-.5136, .2977, .0254]
@@ -51,13 +51,13 @@ T5 = [-.3460, .1936, .000]
 
 
 # froundtruth printed on the scatter plot
-gt_point_index = H
-gt_point_thumb = F
+gt_point_index = A
+gt_point_thumb = B
 
 # axes rangeD
 axis_range_x = [-0.6, -0.28]
 axis_range_y = [0.10, 0.40]
-axis_range_z = [0.0, 0.15]
+axis_range_z = [-0.05, 0.15]
 
 # steps for tick printing on the axes
 step_x = .01
@@ -264,10 +264,10 @@ def print2dPlot( axis1, axis2, new_df, new_listOfKeyPoints_x,new_listOfKeyPoints
 	if ( [axis1, axis2] == ['x', 'y']):
 		plt.xticks(np.arange(axis_range_x[0], axis_range_x[1], step=step_x))
 		plt.yticks(np.arange(axis_range_y[0], axis_range_y[1], step=step_y))
-		ax.set_xlim(axis_range_x)
-		ax.set_ylim(axis_range_y)
+		# ax.set_xlim(axis_range_x)
+		# ax.set_ylim(axis_range_y)
 
-		# get two gaussian random numbers, mean=0, std=1, 2 numbers
+
 		gt_points_ax1 = [gt_point_index[0], gt_point_thumb[0]]
 		gt_points_ax2 = [gt_point_index[1], gt_point_thumb[1]]
 
@@ -297,12 +297,12 @@ def print2dPlot( axis1, axis2, new_df, new_listOfKeyPoints_x,new_listOfKeyPoints
 	std_ax1 = np.std(new_df[new_listOfKeyPoints_ax1])
 	std_ax2 = np.std(new_df[new_listOfKeyPoints_ax2])
 
-	print('index point mean'+ axis1 + '-' + axis2 + ':' + str(mean_ax1[0]) + ',' + str(mean_ax2[0]))
-	print('index point sted'+ axis1 + '-' + axis2 + ':' + str(std_ax1[0]) + ',' + str(std_ax2[0]))
+	print('index point mean '+ axis1 + '-' + axis2 + ':' + str(mean_ax1[0]) + ',' + str(mean_ax2[0]))
+	print('index point sted '+ axis1 + '-' + axis2 + ':' + str(std_ax1[0]) + ',' + str(std_ax2[0]))
 
 
-	print('thumb point mean'+ axis1 + '-' + axis2 + ':' + str(mean_ax1[1]) + ',' + str(mean_ax2[1]))
-	print('thumb point sted'+ axis1 + '-' + axis2 + ':' + str(std_ax1[1]) + ',' + str(std_ax2[1]))
+	print('thumb point mean '+ axis1 + '-' + axis2 + ':' + str(mean_ax1[1]) + ',' + str(mean_ax2[1]))
+	print('thumb point sted '+ axis1 + '-' + axis2 + ':' + str(std_ax1[1]) + ',' + str(std_ax2[1]))
 	#print('Mean and stdev for axis:' + axis2 + 'is: (' + mean_ax2 + ', ' + std_ax2)
 
 	# plot ground truth points

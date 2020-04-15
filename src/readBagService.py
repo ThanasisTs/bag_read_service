@@ -84,7 +84,7 @@ class ReadRosBagService():
             return EmptyResponse()
         except RuntimeError,e:
             rospy.logerr("Exception caught:\n%s", e)
-            return None 
+            return 0 
 
 if __name__=='__main__':
 
@@ -96,9 +96,9 @@ if __name__=='__main__':
     rrbs = ReadRosBagService(bag_file)
 
     while not rospy.is_shutdown():
-        if all(value for value in rrbs.listOfEndConditions.values()):
+        if any(value for value in rrbs.listOfEndConditions.values()):
             break
-        rospy.spin()
+        # rospy.spin()
 
     for topic in rrbs.topics:
         print("Bag Reader: Total published msgs from topic %s: %d "%(topic, rrbs.listOfCounts[topic]))
