@@ -90,8 +90,9 @@ if __name__=='__main__':
 
     rospy.init_node('bag_by_service')
 
-    bag_file = rospy.get_param('~bag_file') 
-    #bag_file = sys.argv[1]
+    #bag_file = rospy.get_param('~bag_file') 
+    bag_file = sys.argv[1]
+    print(bag_file)
     #run this file with the name of the bag file
     rrbs = ReadRosBagService(bag_file)
 
