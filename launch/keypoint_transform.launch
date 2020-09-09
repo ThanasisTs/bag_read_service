@@ -2,11 +2,11 @@
 <launch>
 	<node pkg="bag_read_service" type="readBagService.py" name="BagServer" output="screen">
 		 <!-- <param name="bag_file" value="/home/liger/temp-rosbags/reaching_x1.bag" /> -->
-		 <param name="bag_file" value="/home/ligerfotis/CSE6963_rosbag_data/rgbd/test_static_fingers.bag" />	 
+		 <param name="bag_file" value="/home/liger/object_grasping/MD_C1_1.bag" />	 
 	</node>
 
 	<node pkg="bag_read_service" type="clientBag.py" name="BagClient" output="screen">
-		 <param name="listen_topic" value="/keypoint_3d_matching" />	 
+		 <param name="listen_topic" value="/topic_transform" />	 
 	</node>
 
 	<!-- /topic_transform -->

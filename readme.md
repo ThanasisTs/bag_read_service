@@ -23,12 +23,14 @@
 ### Run Code
 
 Open a __new terminal__ and run an [openpose_utils](https://github.com/Roboskel-Manipulation/openpose_utils) launch file.
+
 Example: 
+
         roslaunch openpose_utils_launch openpose_sole.launch bag_file:="filename"
 
 In a __new terminal__ run
         
-        roslaunch bag_read_service bag_read_service.launch
+        roslaunch bag_read_service bag_read_service.launch bag_file:="filename"
 The `bag_read_service.launch` starts the server `readBagService.py`. In the `bag_read_service.launch` update the `bag_file` parameter with the name of the file you want to read.
 `readBagService.py` provides the service of reading the rosbag file and publishes its topics.
 

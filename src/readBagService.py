@@ -54,6 +54,8 @@ class ReadRosBagService():
         # retrieve a list of topics from the rosbag file
         info = self.bag.get_type_and_topic_info()
         topics = list(info[1].keys())
+        del topics[1]
+        print topics
         # retrieve a list of message types from the rosbag file
         # NOT WORKING PROPERLY | USE THE HARD-CODED LIST
         types = {}
