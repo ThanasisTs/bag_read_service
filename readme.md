@@ -26,7 +26,7 @@ Open a __new terminal__ and run an [openpose_utils](https://github.com/Roboskel-
 
 Example: 
 
-        roslaunch openpose_utils_launch openpose_sole.launch bag_file:="filename"
+        roslaunch openpose_utils_launch whole_pipeline_xtion_with_marker.launch
 
 In a __new terminal__ run
         
