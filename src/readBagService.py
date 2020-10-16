@@ -27,8 +27,7 @@ class ReadRosBagService():
         self.messages = {}
         self.listOfCounts = {}
         self.listOfEndConditions = {}
-        # self.msg_types = [CameraInfo, Image, Image, PointCloud2, Clock]
-
+        
         #Create a publisher for each topic
         self.topics, self.msg_types = self.get_topic_and_type_list()
 
@@ -54,15 +53,13 @@ class ReadRosBagService():
         # retrieve a list of topics from the rosbag file
         info = self.bag.get_type_and_topic_info()
         topics = list(info[1].keys())
-        del topics[1]
-        print topics
+        
         # retrieve a list of message types from the rosbag file
         # NOT WORKING PROPERLY | USE THE HARD-CODED LIST
         types = {}
         for topic in topics:
             types[topic] = eval((info[1][topic][0]).split("/")[1])
-        # print types
-        # input()
+        
         return topics, types 
 
     def pub_next_msg(self):
@@ -75,7 +72,6 @@ class ReadRosBagService():
                 continue
             if time is None:
                 time = t
-            # msg.header.stamp = rospy.Time.now()
             self.publishers[topic].publish(msg)
             self.listOfCounts[topic] += 1
         self.clockPublisher.publish(time)
@@ -91,11 +87,11 @@ class ReadRosBagService():
 if __name__=='__main__':
 
     rospy.init_node('bag_by_service')
-
-    #bag_file = rospy.get_param('~bag_file') 
+    
+    # Rosbag file 
     bag_file = sys.argv[1]
-    print(bag_file)
-    #run this file with the name of the bag file
+    
+    #Run this file with the name of the bag file
     rrbs = ReadRosBagService(bag_file)
 
     while not rospy.is_shutdown():
@@ -106,4 +102,6 @@ if __name__=='__main__':
     for topic in rrbs.topics:
         print("Bag Reader: Total published msgs from topic %s: %d "%(topic, rrbs.listOfCounts[topic]))
     
+    # Wait a bit before closing the rosbag
+    rospy.sleep(0.2)
     rrbs.bag.close()

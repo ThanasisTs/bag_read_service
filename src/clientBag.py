@@ -26,7 +26,6 @@ if __name__ == "__main__":
 	# Create the connection to the service.
 	service = rospy.ServiceProxy('/next_msg', Empty)
 
-	#run this file with the name of the topic
 	listen_topic = rospy.get_param('~listen_topic') 
 	topic_sub = rospy.Subscriber(listen_topic, Keypoint3d_list, callback)
 	rospy.spin()
