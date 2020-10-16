@@ -103,5 +103,5 @@ if __name__=='__main__':
         print("Bag Reader: Total published msgs from topic %s: %d "%(topic, rrbs.listOfCounts[topic]))
     
     # Wait a bit before closing the rosbag
-    rospy.sleep(0.2)
+    rospy.sleep(0.5)
     rrbs.bag.close()
