@@ -3,38 +3,28 @@
 ##### Rosbag Read (RR) Server
 
 ###### Service Provided
-- Read from a rosbag file one message at a time for every topic
+- Reads from a rosbag one message at a time for every topic
 - Publish each message at its topic
 
 ##### Rosbag Read Client
 
 ###### Functionality
-- Listen to a specific topic.
-- When a message from this topic is received, ask a RR service from the server.
+- Listens to a specific topic.
+- When a message from this topic is received, asks a RR service.
+
+__Note:__ Define the topic name in the bag.launch and the message type in the clientBag.py.
 
 ##### Server-Client Loop
-- Call the service of the RR server once to start the loop
-- The openpose_utils pipeline receives the messages from the rosbag file and eventually publishes a list of 3D keypoints.
-- The client listens to this topic.
-- The loop stops when there is a topic in the rosbag file with no other messages.
-
+- Call the service once to start the loop
+- When the client listens to its specified topic, it makes the next service call.
+- The loop stops when there is no other message.
 
 
 ### Run Code
 
-Open a __new terminal__ and run an [openpose_utils](https://github.com/Roboskel-Manipulation/openpose_utils) launch file.
-
-Example: 
-
-        roslaunch openpose_utils_launch whole_pipeline_xtion_with_marker.launch
-
 In a __new terminal__ run
         
         roslaunch bag_read_service bag_read_service.launch bag_file:="filename"
-The `bag_read_service.launch` starts the server `readBagService.py`. In the `bag_read_service.launch` update the `bag_file` parameter with the name of the file you want to read.
-`readBagService.py` provides the service of reading the rosbag file and publishes its topics.
-
-The client node `clientBag.py`, which is also initiated, uses the listen_topic parameter to define which topic the client should listen at. Every time that there is a new message on this topic the client requests the service of `readBagService.py`.
 
 In a __new terminal__ run 
 
